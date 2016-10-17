@@ -1,13 +1,24 @@
-<div>
-	<form action={{if edit "{{publicId}}/edit/{{privateId}}" "create"}} method="post">
-		<label for="title">
-			Title
-			<input type="text" id="title" />
-		</label>
-		<label>
-			Description
-			<textarea id="description"></textarea>
-		</label>
-		<input type="submit" value={{if edit "Edit" "Create"}} />
-	</form>
-</div>
+<html>
+	<head>
+		<meta key="create-mode" value="{{tern create 1 0}}" />
+		{{#if create}}
+			<meta key="publicId" value="{{publicId}}" />
+			<meta key="privateId" value="{{privateId}}" />
+		{{/if}}
+	</head>
+	<body>
+		<form>
+			<label for="title">
+				Title
+				<input type="text" id="title" />
+			</label>
+			<label>
+				Description
+				<textarea id="description"></textarea>
+			</label>
+			<input type="submit" id="submit" value="{{tern create "Create" "Edit"}}" />
+		</form>
+
+		<script src="/js/edit.js"></script>
+	</body>
+</html>
