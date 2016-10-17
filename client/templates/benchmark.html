@@ -1,0 +1,19 @@
+<div class="row">
+	<div>Title:</div>
+	<div>{{name}}</div>
+</div>
+<div class="row">
+	<div>Description:</div>
+	<div>{{description}}</div>
+</div>
+
+<div class="setup">
+	{{globalSetup}}
+</div>
+
+{{#each tests}}
+	<div class="test">
+		<div>{{name}}</div>
+		<pre>{{code}}</pre>
+	</div>
+{{/each}}

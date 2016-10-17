@@ -1,0 +1,13 @@
+<div>
+	<form action={{if edit "{{publicId}}/edit/{{privateId}}" "create"}} method="post">
+		<label for="title">
+			Title
+			<input type="text" id="title" />
+		</label>
+		<label>
+			Description
+			<textarea id="description"></textarea>
+		</label>
+		<input type="submit" value={{if edit "Edit" "Create"}} />
+	</form>
+</div>
