@@ -12,7 +12,7 @@ $form.addEventListener('submit', function (event) {
 });
 
 $submit.addEventListener('click', function (event) {
-	event.preventDetault();
+	event.preventDefault();
 	fetch(create ? `/create` : `/${publicId}/edit/${privateId}`, {
 		method: 'post',
 		body: new FormData($form),
