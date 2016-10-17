@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
+const PORT=8080;
+
+
 const express=require("express"),
       hbs=require("hbs"),
       sqlite3=require("sqlite3"),
       bodyParser=require("body-parser"),
+      multer=require("multer")(),
       util=require("util");
 
 const app=express();
 
 require("./hbs_helpers")(hbs);
-
-const PORT=8080;
 
 app.set("view engine","html");
 app.engine("html",hbs.__express);
@@ -18,6 +20,8 @@ app.set("views","client/templates");
 
 //app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.text());
+
+app.use(multer.array());
 
 const db=new sqlite3.Database("db.db");
 
