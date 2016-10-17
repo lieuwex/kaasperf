@@ -1,5 +1,5 @@
 var $form = document.getElementsByTagName('form')[0];
-var $title = document.getElementById('title');
+var $name = document.getElementById('name');
 var $description = document.getElementById('description');
 var $submit = document.getElementById('submit');
 
