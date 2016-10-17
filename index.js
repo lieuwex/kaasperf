@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
-const app=require("express")(),
+const express=require("express"),
       hbs=require("hbs"),
       sqlite3=require("sqlite3"),
-      bodyParser=require("body-parser");
+      bodyParser=require("body-parser"),
+      util=require("util");
+
+const app=express();
 
 require("./hbs_helpers")(hbs);
 
@@ -13,7 +16,8 @@ app.set("view engine","html");
 app.engine("html",hbs.__express);
 app.set("views","client/templates");
 
-app.use(bodyParser.urlencoded({extended:true}));
+//app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.text());
 
 const db=new sqlite3.Database("db.db");
 
@@ -42,31 +46,67 @@ function verifyBenchmark(b){
 function addBenchmark(b){
 	db.serialize(function(){
 		db.run("INSERT INTO benchmarks (name, description, globalsetup) VALUES (?,?,?)",b.name,b.description,b.globalsetup);
+		console.log("Benchmark added...");
 		db.get("SELECT last_insert_rowid() AS bid",function(err,row){
 			for(test of tests){
 				db.run("INSERT INTO tests (bid, name, setup, testcode, teardown) VALUES (?,?,?,?)",row.bid,b.setup,b.testcode,b.teardown);
+				console.log("Test added...");
 			}
 		});
+		console.log("Benchmark add done");
 	});
 }
 
+function getBenchmark(pubid,cb){
+	console.log("Benchmark get "+pubid);
+	pubid=+pubid;
+	if(isNaN(pubid)||pubid<=0)cb(null);
+	db.serialise(function(){
+		//db.get("SELECT name, description, globalsetup FROM benchmarks WHERE ")
+	});
+}
+
+
+app.use(function(req,res,next){
+	console.log(req.method+" "+req.originalUrl+" "+util.inspect(req.body));
+	next();
+});
 
 app.get("/",function(req,res){
 	res.redirect("/submit");
 });
 
 app.get("/submit",function(req,res){
-	res.render("edit",{edit:false});
+	res.render("edit",{create:true});
 });
 
 app.post("/create",function(req,res){
-	const bench={name:req.name,description:req.description,globalsetup:req.globalsetup,tests:req.tests};
+	const bench={
+		name:req.body.name,
+		description:req.body.description,
+		globalsetup:req.body.globalsetup,
+		tests:req.body.tests
+	};
 	if(!verifyBenchmark(bench)){
+		console.log("Benchmark verify failed");
 		res.status(400).redirect("/submit");
-	} else {
-		const [pubid,privid]=addBenchmark(bench);
-		res.redirect("/"+pubid);
+		return;
 	}
+	const [pubid,privid]=addBenchmark(bench);
+	res.redirect("/"+pubid);
+});
+
+app.use("/js",express.static("client/js"));
+
+app.get("/:pubid",function(req,res){
+	const pubid=req.params.id;
+	getBenchmark(pubid,function(bench){
+		if(typeof bench!="number"){
+			res.status(404).redirect("/");
+			return;
+		}
+		res.render("benchmark",{publicId:pubid});
+	});
 });
 
 
